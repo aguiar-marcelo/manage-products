@@ -24,6 +24,11 @@ class UserSerializer(serializers.ModelSerializer):
             'password': {'write_only': True}
         }
 
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email is already in use.")
+        return value
+
     def create(self, validated_data):
         password = validated_data.pop('password')
         username = validated_data.get('email', 'usuario')

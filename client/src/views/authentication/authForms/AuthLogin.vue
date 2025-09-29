@@ -56,11 +56,10 @@ async function validate(values: any, { setErrors }: any) {
       />
     </Field>
 
-    <v-btn :loading="isSubmitting" type="submit" block color="secondary" class="mt-6" variant="flat" size="large">Entrar</v-btn>
-
     <div v-if="errors.apiError" class="mt-2">
-      <v-alert color="error">{{ errors.apiError }}</v-alert>
+      <v-alert color="error" class="error">{{ errors.apiError }}</v-alert>
     </div>
+    <v-btn :loading="isSubmitting" type="submit" block color="secondary" class="mt-6" variant="flat" size="large">Entrar</v-btn>
   </Form>
   <div class="mt-5 text-right">
     <v-divider />
@@ -68,22 +67,6 @@ async function validate(values: any, { setErrors }: any) {
   </div>
 </template>
 <style lang="scss">
-.custom-devider {
-  border-color: rgba(0, 0, 0, 0.08) !important;
-}
-.googleBtn {
-  border-color: rgba(0, 0, 0, 0.08);
-  margin: 30px 0 20px 0;
-}
-.outlinedInput .v-field {
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: none;
-}
-.orbtn {
-  padding: 2px 40px;
-  border-color: rgba(0, 0, 0, 0.08);
-  margin: 20px 15px;
-}
 .pwdInput {
   position: relative;
   .v-input__append {
@@ -97,5 +80,8 @@ async function validate(values: any, { setErrors }: any) {
   .v-text-field .v-field--active input {
     font-weight: 500;
   }
+}
+.error {
+  padding: 5px 1rem;
 }
 </style>

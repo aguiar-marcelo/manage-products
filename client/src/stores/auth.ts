@@ -1,5 +1,3 @@
-// src/stores/auth.ts
-
 import { defineStore } from 'pinia';
 import { router } from '@/router';
 import api from '@/services/api';
@@ -13,8 +11,6 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   actions: {
-    // Este método agora é chamado manualmente
-    // e executa a lógica de inicialização de forma segura.
     initializeUser() {
       const storedUser = localStorage.getItem('user');
       if (storedUser) {
@@ -41,6 +37,27 @@ export const useAuthStore = defineStore('auth', {
           throw new Error('Usuário ou senha incorretos.');
         } else {
           throw new Error('Ocorreu um erro. Por favor, tente novamente mais tarde.');
+        }
+      }
+    },
+
+    async register(first_name: string, last_name: string, email: string, password: string) {
+      try {
+        const response = await api.post('/register/', {
+          first_name,
+          last_name,
+          email,
+          password
+        });
+
+        console.log('Usuário registrado com sucesso!', response.data);
+
+        router.push('/login');
+      } catch (error: any) {
+        if (error.response && error.response.status === 400) {
+          throw new Error('Este e-mail já está em uso.');
+        } else {
+          throw new Error('Ocorreu um erro ao tentar registrar. Tente novamente mais tarde.');
         }
       }
     },

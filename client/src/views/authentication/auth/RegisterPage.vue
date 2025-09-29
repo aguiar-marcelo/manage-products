@@ -14,12 +14,11 @@ import AuthRegister from '../authForms/AuthRegister.vue';
               <v-card elevation="0" class="loginBox">
                 <v-card variant="outlined">
                   <v-card-text class="pa-9">
-                    <!---Left Part Logo -->
                     <v-row>
                       <v-col cols="12" class="text-center">
                         <Logo />
-                        <h2 class="text-secondary text-h2 mt-8">Sign up</h2>
-                        <h4 class="text-disabled text-h4 mt-3">Enter credentials to continue</h4>
+                        <h2 class="text-secondary text-h2 mt-8">Cadastre-se</h2>
+                        <h4 class="text-disabled text-h4 mt-2">Digite suas credenciais para continuar</h4>
                       </v-col>
                     </v-row>
                     <AuthRegister />
