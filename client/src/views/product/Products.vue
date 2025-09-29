@@ -5,7 +5,8 @@ import UiParentCard from '@/components/shared/UiParentCard.vue';
 import type { Product } from '@/types/product';
 import { getProducts } from '@/services/productServices';
 import dayjs from 'dayjs';
-import 'dayjs/locale/pt-br'; 
+import 'dayjs/locale/pt-br';
+import { titleize } from '@/utils/texts';
 dayjs.locale('pt-br');
 
 const products = ref<Product[]>([]);
@@ -58,7 +59,9 @@ onMounted(() => {
                 :src="product.image || 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Image-not-found.png?20210521171500'"
                 height="200px"
                 cover
-                ><span class="expiration">Validade: <strong>{{ dayjs(product.expiration_date).format('DD/MM/YYYY') }}</strong></span></v-img
+                ><span class="expiration"
+                  >Validade: <strong>{{ dayjs(product.expiration_date).format('DD/MM/YYYY') }}</strong></span
+                ></v-img
               >
               <v-card-title>{{ product.name || 'Sem nome' }}</v-card-title>
               <v-card-subtitle class="mt-0">
@@ -89,7 +92,7 @@ onMounted(() => {
   opacity: 1;
   font-size: 14px;
 }
-.expiration{
+.expiration {
   position: absolute;
   bottom: 0;
   right: 0;

@@ -19,5 +19,5 @@ export interface NewProduct {
   price: number;
   validate: string;
   img: File | null;
-  categorie: Category | null | undefined;
+  category: Category | null | undefined;
 }
