@@ -41,6 +41,26 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    async refreshToken() {
+      try {
+        const response = await api.post('/token/refresh/', {
+          refresh: this.refresh_token
+        });
+
+        const { access, refresh } = response.data;
+
+        this.access_token = access;
+        this.refresh_token = refresh;
+        localStorage.setItem('access_token', access);
+        localStorage.setItem('refresh_token', refresh);
+
+        return access;
+      } catch (error) {
+        this.logout();
+        throw error;
+      }
+    },
+
     async register(first_name: string, last_name: string, email: string, password: string) {
       try {
         const response = await api.post('/register/', {

@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Category, Product
 from .serializers import CategorySerializer, ProductSerializer, UserSerializer, MyTokenObtainPairSerializer
 from django.contrib.auth.models import User
+from .pagination import CustomPageNumberPagination
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -11,9 +12,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by('-id')
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = CustomPageNumberPagination
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()

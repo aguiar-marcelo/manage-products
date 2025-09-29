@@ -3,28 +3,30 @@ import { ref, shallowRef } from 'vue';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
 import { UploadIcon } from 'vue-tabler-icons';
+import { postProduct } from '@/services/productServices';
+import type { NewProduct } from '@/types/product';
 
-// const page = ref({ title: 'Adicionar Produto' });
-// const breadcrumbs = shallowRef([
-//   {
-//     title: 'Produtos',
-//     disabled: false,
-//     href: '#'
-//   },
-//   {
-//     title: 'Adicionar Produto',
-//     disabled: true,
-//     href: '#'
-//   }
-// ]);
+const page = ref({ title: 'Adicionar Produto' });
+const breadcrumbs = shallowRef([
+  {
+    title: 'Produtos',
+    disabled: false,
+    href: '#'
+  },
+  {
+    title: 'Adicionar Produto',
+    disabled: true,
+    href: '#'
+  }
+]);
 
-const newProduct = ref({
+const newProduct = ref<NewProduct>({
   name: '',
   desc: '',
   price: 0.0,
   validate: '',
-  img: null as File | null,
-  categorie: null as { id: number; name: string } | null
+  img: null,
+  categorie: null
 });
 
 const categories = ref([
@@ -35,8 +37,8 @@ const categories = ref([
 ]);
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
-
 const fileName = ref('');
+const isSubmitting = ref(false);
 
 const triggerFileInput = () => {
   if (fileInputRef.value) {
@@ -56,9 +58,32 @@ const onFileChange = (event: Event) => {
   }
 };
 
-const submitForm = () => {
-  console.log('Dados do produto a ser enviado:', newProduct.value);
-  alert('Formulário enviado! Verifique o console para os dados.');
+const submitForm = async () => {
+  isSubmitting.value = true;
+  try {
+    await postProduct(newProduct.value);
+
+    alert('Produto adicionado com sucesso!');
+
+    newProduct.value = {
+      name: '',
+      desc: '',
+      price: 0.0,
+      validate: '',
+      img: null,
+      categorie: null
+    };
+    fileName.value = '';
+  } catch (error: any) {
+    console.error('Erro ao adicionar produto:', error);
+    if (error.response && error.response.data) {
+      alert('Erro: ' + JSON.stringify(error.response.data));
+    } else {
+      alert('Ocorreu um erro ao adicionar o produto. Tente novamente.');
+    }
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 </script>
 
@@ -70,13 +95,7 @@ const submitForm = () => {
         <v-form @submit.prevent="submitForm">
           <v-row>
             <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="newProduct.name"
-                label="Nome do Produto"
-                variant="outlined"
-                density="compact"
-                required
-              ></v-text-field>
+              <v-text-field v-model="newProduct.name" label="Nome do Produto" variant="outlined" density="compact" required></v-text-field>
             </v-col>
 
             <v-col cols="12" sm="6">

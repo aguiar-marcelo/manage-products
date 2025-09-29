@@ -24,12 +24,12 @@ const MainRoutes = {
     {
       name: 'Products',
       path: '/products',
-      component: () => import('@/views/Products.vue')
+      component: () => import('@/views/product/Products.vue')
     },
     {
       name: 'AddProduct',
       path: '/add-products',
-      component: () => import('@/views/AddProducts.vue')
+      component: () => import('@/views/product/AddProducts.vue')
     },
     ///////////////// ------------------
     {
