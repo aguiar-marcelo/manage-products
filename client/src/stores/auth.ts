@@ -7,7 +7,7 @@ export const useAuthStore = defineStore('auth', {
     user: null,
     access_token: localStorage.getItem('access_token') || null,
     refresh_token: localStorage.getItem('refresh_token') || null,
-    returnUrl: null
+    returnUrl: null as string | null
   }),
 
   actions: {

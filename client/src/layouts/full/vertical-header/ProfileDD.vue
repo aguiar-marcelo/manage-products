@@ -7,8 +7,8 @@ const authStore = useAuthStore();
 </script>
 <template>
   <div class="pa-4">
-    <h4 class="mb-n1"><span class="font-weight-regular">Marcelo Santos</span></h4>
-    <span class="text-subtitle-2 text-medium-emphasis">Admin</span>
+    <h4 class="mb-n1"><span class="font-weight-regular">{{ authStore.user?.first_name }} {{ authStore.user?.last_name }}</span></h4>
+    <span class="text-subtitle-2 text-medium-emphasis">{{ authStore.user?.email }}</span>
 
     <v-divider class="mt-2"></v-divider>
     <perfect-scrollbar>
