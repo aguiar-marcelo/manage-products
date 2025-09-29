@@ -17,7 +17,6 @@ const breadcrumbs = shallowRef([
   }
 ]);
 
-// Dados de exemplo dos produtos
 const products = ref([
   {
     name: 'Teclado Gamer',

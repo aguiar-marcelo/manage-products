@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 
-// import icons
 import { ChevronUpIcon, ChevronDownIcon } from 'vue-tabler-icons';
 
-// chart 1
 const chartOptions1 = computed(() => {
   return {
     chart: {
@@ -44,7 +42,6 @@ const chartOptions1 = computed(() => {
   };
 });
 
-// chart 1
 const lineChart1 = {
   series: [
     {

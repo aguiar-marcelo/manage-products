@@ -1,0 +1,24 @@
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework import viewsets, generics
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from .models import Category, Product
+from .serializers import CategorySerializer, ProductSerializer, UserSerializer, MyTokenObtainPairSerializer
+from django.contrib.auth.models import User
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
+
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
