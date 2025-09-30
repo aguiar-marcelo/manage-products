@@ -39,21 +39,38 @@ const triggerFileInput = () => {
 };
 
 const categories = ref<Category[]>([]);
+const selectedCategory = ref<Category | null>(null);
 
 const schema = yup.object({
   name: yup.string().required('Nome é obrigatório').max(50, 'Nome deve ter no máximo 50 caracteres'),
   price: yup.number().typeError('Preço deve ser um número').required('Preço é obrigatório').positive('Preço deve ser maior que 0'),
   desc: yup.string().max(200, 'Descrição deve ter no máximo 200 caracteres'),
-  validate: yup.date()
+  validate: yup
+    .date()
     .required('Data de validade obrigatório')
     .min(dayjs().startOf('day').toDate(), 'A data de validade não pode ser anterior à data atual'),
-  category: yup.object().shape({
-    id: yup.number().required(),
-    name: yup.string().required('Categoria é obrigatória'),
-  }).nullable().required('Categoria é obrigatória'),
-  img: yup.mixed().required('Imagem é obrigatória'),
+  category: yup
+    .object()
+    .shape({
+      id: yup.number().required(),
+      name: yup.string().required('Categoria é obrigatória')
+    })
+    .nullable()
+    .required('Categoria é obrigatória'),
+  img: yup.mixed().required('Imagem é obrigatória')
 });
 
+const handlePriceChange = (value: string, handleChange: Function) => {
+  let cleanValue = value.replace(/,/g, '.');
+  let dotCount = cleanValue.split('.').length - 1;
+
+  if (dotCount > 1) {
+    const parts = cleanValue.split('.');
+    cleanValue = parts.shift() + '.' + parts.join('');
+  }
+
+  handleChange(cleanValue);
+};
 
 const handleAddProduct = async (values: any, { resetForm }: any) => {
   try {
@@ -67,8 +84,12 @@ const handleAddProduct = async (values: any, { resetForm }: any) => {
     };
     await postProduct(productData);
     alert.success('Produto adicionado com sucesso!');
+    selectedCategory.value = null;
     resetForm();
     fileName.value = '';
+    if (fileInputRef.value) {
+      fileInputRef.value.value = '';
+    }
   } catch (error: any) {
     console.error('Erro ao adicionar produto:', error);
     alert.error('Erro ao adicionar produto. Verifique os dados.');
@@ -144,12 +165,12 @@ onMounted(() => {
             <v-col cols="12" sm="6">
               <Field name="price" v-slot="{ field, errorMessage }">
                 <v-text-field
-                  v-model="field.value"
                   v-bind="field"
+                  :model-value="field.value"
+                  @update:model-value="(val) => handlePriceChange(val, field.onChange)"
                   label="Preço"
-                  placeholder="Ex: 150.75"
+                  placeholder="Ex: 15.50"
                   prefix="R$"
-                  type="number"
                   variant="outlined"
                   density="compact"
                   required
@@ -176,6 +197,7 @@ onMounted(() => {
                 <Field name="category" v-slot="{ field, errorMessage }">
                   <v-select
                     v-bind="field"
+                    v-model="selectedCategory"
                     :items="categories"
                     item-title="name"
                     item-value="id"
@@ -213,7 +235,13 @@ onMounted(() => {
                   Selecionar Imagem
                 </v-btn>
                 <span v-if="fileName" class="text-subtitle-1 ml-4">{{ fileName }}</span>
-                <input ref="fileInputRef" type="file" style="display: none" accept="image/*" @change="e => onFileChange(e, handleChange)" />
+                <input
+                  ref="fileInputRef"
+                  type="file"
+                  style="display: none"
+                  accept="image/*"
+                  @change="(e) => onFileChange(e, handleChange)"
+                />
                 <div v-if="errorMessage" class="text-error mt-2">{{ errorMessage }}</div>
               </Field>
             </v-col>

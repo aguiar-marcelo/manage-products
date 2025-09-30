@@ -8,7 +8,7 @@ export async function postProduct(productData: any) {
     formData.append('description', productData.desc);
     formData.append('price', productData.price.toString());
     formData.append('expiration_date', productData.validate);
-    formData.append('category', productData.category.id);
+    formData.append('category_id', productData.category.id);
     if (productData.img) {
       formData.append('image', productData.img);
     }
