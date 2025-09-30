@@ -24,10 +24,10 @@ export async function postProduct(productData: any) {
   }
 }
 
-
 export async function getProducts(
   page = 1,
-  limit = 12
+  limit = 12,
+  search = ''
 ): Promise<{
   currentPage: number;
   totalPages: number;
@@ -35,7 +35,7 @@ export async function getProducts(
   data: Product[];
 }> {
   const { data } = await api.get('/products/', {
-    params: { page, limit }
+    params: { page, limit, search }
   });
 
   return data;
