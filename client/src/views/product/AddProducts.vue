@@ -1,36 +1,18 @@
 <script setup lang="ts">
-import { ref, shallowRef, onMounted } from 'vue';
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
+import { ref, onMounted } from 'vue';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
 import { UploadIcon, PlusIcon, TrashIcon } from 'vue-tabler-icons';
 import { postProduct, getCategories, postCategory, deleteCategory } from '@/services/productServices';
-import type { NewProduct, Category } from '@/types/product';
+import type { Category } from '@/types/product';
 import { titleize } from '@/utils/texts';
+import { useAlertStore } from '@/stores/alertStore';
+import { Form, Field } from 'vee-validate';
+import * as yup from 'yup';
+import dayjs from 'dayjs';
+dayjs().locale('pt-br');
 
-const page = ref({ title: 'Adicionar Produto' });
-const breadcrumbs = shallowRef([
-  {
-    title: 'Produtos',
-    disabled: false,
-    href: '#'
-  },
-  {
-    title: 'Adicionar Produto',
-    disabled: true,
-    href: '#'
-  }
-]);
+const alert = useAlertStore();
 
-const newProduct = ref<NewProduct>({
-  name: '',
-  desc: '',
-  price: 0.0,
-  validate: '',
-  img: null,
-  category: null
-});
-
-const categories = ref<Category[]>([]);
 const dialog = ref(false);
 const newCategoryName = ref('');
 const isSubmitting = ref(false);
@@ -39,53 +21,57 @@ const isModalSubmitting = ref(false);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const fileName = ref('');
 
-const triggerFileInput = () => {
-  if (fileInputRef.value) {
-    fileInputRef.value.click();
-  }
-};
-
-const onFileChange = (event: Event) => {
+const onFileChange = (event: Event, handleChange: Function) => {
   const target = event.target as HTMLInputElement;
-  const files = target.files;
-  if (files && files.length > 0) {
-    const selectedFile = files[0];
-    if (selectedFile) {
-      newProduct.value.img = selectedFile;
-      fileName.value = selectedFile.name;
-    } else {
-      newProduct.value.img = null;
-      fileName.value = '';
-    }
+  const file = target.files ? target.files[0] : null;
+
+  if (file) {
+    fileName.value = file.name;
+    handleChange(file);
   } else {
-    newProduct.value.img = null;
     fileName.value = '';
+    handleChange(null);
   }
 };
 
-const handleAddProduct = async () => {
-  isSubmitting.value = true;
+const triggerFileInput = () => {
+  fileInputRef.value?.click();
+};
+
+const categories = ref<Category[]>([]);
+
+const schema = yup.object({
+  name: yup.string().required('Nome é obrigatório').max(50, 'Nome deve ter no máximo 50 caracteres'),
+  price: yup.number().typeError('Preço deve ser um número').required('Preço é obrigatório').positive('Preço deve ser maior que 0'),
+  desc: yup.string().max(200, 'Descrição deve ter no máximo 200 caracteres'),
+  validate: yup.date()
+    .required('Data de validade obrigatório')
+    .min(dayjs().startOf('day').toDate(), 'A data de validade não pode ser anterior à data atual'),
+  category: yup.object().shape({
+    id: yup.number().required(),
+    name: yup.string().required('Categoria é obrigatória'),
+  }).nullable().required('Categoria é obrigatória'),
+  img: yup.mixed().required('Imagem é obrigatória'),
+});
+
+
+const handleAddProduct = async (values: any, { resetForm }: any) => {
   try {
-    await postProduct(newProduct.value);
-    alert('Produto adicionado com sucesso!');
-    newProduct.value = {
-      name: '',
-      desc: '',
-      price: 0.0,
-      validate: '',
-      img: null,
-      category: null
+    const productData = {
+      name: values.name,
+      desc: values.desc || '',
+      price: values.price,
+      validate: values.validate,
+      img: values.img,
+      category: values.category
     };
+    await postProduct(productData);
+    alert.success('Produto adicionado com sucesso!');
+    resetForm();
     fileName.value = '';
   } catch (error: any) {
     console.error('Erro ao adicionar produto:', error);
-    if (error.response && error.response.data) {
-      alert('Erro: ' + JSON.stringify(error.response.data));
-    } else {
-      alert('Ocorreu um erro ao adicionar o produto. Tente novamente.');
-    }
-  } finally {
-    isSubmitting.value = false;
+    alert.error('Erro ao adicionar produto. Verifique os dados.');
   }
 };
 
@@ -95,21 +81,21 @@ const fetchCategories = async () => {
     categories.value = response;
   } catch (error) {
     console.error('Erro ao buscar categorias:', error);
+    alert.error('Não foi possível carregar as categorias.');
   }
 };
 
 const handleAddCategory = async () => {
-  console.log('aq' + newCategoryName.value);
   if (!newCategoryName.value) return;
   isModalSubmitting.value = true;
   try {
     await postCategory(titleize(newCategoryName.value));
     newCategoryName.value = '';
     await fetchCategories();
-    alert('Categoria adicionada com sucesso!');
+    alert.success('Categoria adicionada com sucesso!');
   } catch (error) {
     console.error('Erro ao adicionar categoria:', error);
-    alert('Ocorreu um erro ao adicionar a categoria.');
+    alert.error('Ocorreu um erro ao adicionar a categoria.');
   } finally {
     isModalSubmitting.value = false;
   }
@@ -121,10 +107,10 @@ const handleDeleteCategory = async (id: number) => {
     try {
       await deleteCategory(id);
       await fetchCategories();
-      alert('Categoria excluída com sucesso!');
+      alert.success('Categoria excluída com sucesso!');
     } catch (error) {
       console.error('Erro ao excluir categoria:', error);
-      alert('Ocorreu um erro ao excluir a categoria.');
+      alert.error('Ocorreu um erro ao excluir a categoria.');
     } finally {
       isModalSubmitting.value = false;
     }
@@ -137,89 +123,112 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb> -->
   <v-row>
     <v-col cols="12" md="12">
       <UiParentCard title="Adicionar Produto">
-        <v-form @submit.prevent="handleAddProduct">
+        <Form @submit="handleAddProduct" :validation-schema="schema" v-slot="{ errors, isSubmitting }">
           <v-row>
             <v-col cols="12" sm="6">
-              <v-text-field v-model="newProduct.name" label="Nome do Produto" variant="outlined" density="compact" required></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model.number="newProduct.price"
-                label="Preço"
-                placeholder="Ex: 150.75"
-                prefix="R$"
-                type="number"
-                variant="outlined"
-                density="compact"
-                required
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12">
-              <v-textarea
-                v-model="newProduct.desc"
-                label="Descrição do Produto"
-                placeholder="Descreva o produto com detalhes"
-                rows="3"
-                variant="outlined"
-                density="compact"
-                required
-              ></v-textarea>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <div class="d-flex align-center">
-                <v-select
-                  v-model="newProduct.category"
-                  :items="categories"
-                  item-title="name"
-                  item-value="id"
-                  label="Categoria"
-                  placeholder="Selecione uma categoria"
-                  return-object
+              <Field name="name" v-slot="{ field, errorMessage }">
+                <v-text-field
+                  v-model="field.value"
+                  v-bind="field"
+                  label="Nome do Produto"
                   variant="outlined"
                   density="compact"
                   required
-                  class="flex-grow-1"
-                ></v-select>
+                  :error-messages="errorMessage"
+                />
+              </Field>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <Field name="price" v-slot="{ field, errorMessage }">
+                <v-text-field
+                  v-model="field.value"
+                  v-bind="field"
+                  label="Preço"
+                  placeholder="Ex: 150.75"
+                  prefix="R$"
+                  type="number"
+                  variant="outlined"
+                  density="compact"
+                  required
+                  :error-messages="errorMessage"
+                />
+              </Field>
+            </v-col>
+            <v-col cols="12">
+              <Field name="desc" v-slot="{ field, errorMessage }">
+                <v-textarea
+                  v-model="field.value"
+                  v-bind="field"
+                  label="Descrição do Produto"
+                  placeholder="Descreva o produto com detalhes"
+                  rows="3"
+                  variant="outlined"
+                  density="compact"
+                  :error-messages="errorMessage"
+                />
+              </Field>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <div class="d-flex">
+                <Field name="category" v-slot="{ field, errorMessage }">
+                  <v-select
+                    v-bind="field"
+                    :items="categories"
+                    item-title="name"
+                    item-value="id"
+                    label="Categoria"
+                    placeholder="Selecione uma categoria"
+                    variant="outlined"
+                    density="compact"
+                    return-object
+                    required
+                    class="flex-grow-1"
+                    :error-messages="errorMessage"
+                  />
+                </Field>
                 <v-btn icon variant="tonal" color="primary" class="ml-2" @click="dialog = true" title="Gerenciar Categorias">
                   <PlusIcon />
                 </v-btn>
               </div>
             </v-col>
-
             <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="newProduct.validate"
-                label="Data de Validade"
-                type="date"
-                variant="outlined"
-                density="compact"
-                required
-              ></v-text-field>
+              <Field name="validate" v-slot="{ field, errorMessage }">
+                <v-text-field
+                  v-bind="field"
+                  label="Data de Validade"
+                  type="date"
+                  variant="outlined"
+                  density="compact"
+                  :error-messages="errorMessage"
+                />
+              </Field>
             </v-col>
             <v-col cols="12" sm="8">
-              <v-btn color="primary" variant="tonal" class="mt-2" @click="triggerFileInput">
-                <UploadIcon :size="20" class="mr-2" />
-                Selecionar Imagem
-              </v-btn>
-              <span v-if="fileName" class="text-subtitle-1 ml-4">{{ fileName }}</span>
-              <input ref="fileInputRef" type="file" style="display: none" accept="image/*" @change="onFileChange" />
+              <Field name="img" v-slot="{ field, errorMessage, handleChange }">
+                <v-btn color="primary" variant="tonal" class="mt-2" @click="triggerFileInput">
+                  <UploadIcon :size="20" class="mr-2" />
+                  Selecionar Imagem
+                </v-btn>
+                <span v-if="fileName" class="text-subtitle-1 ml-4">{{ fileName }}</span>
+                <input ref="fileInputRef" type="file" style="display: none" accept="image/*" @change="e => onFileChange(e, handleChange)" />
+                <div v-if="errorMessage" class="text-error mt-2">{{ errorMessage }}</div>
+              </Field>
             </v-col>
             <v-col cols="12" sm="4" class="text-right">
               <v-btn type="submit" color="primary" class="mt-4" :loading="isSubmitting"> Adicionar Produto </v-btn>
             </v-col>
           </v-row>
-        </v-form>
+        </Form>
       </UiParentCard>
     </v-col>
   </v-row>
 
   <v-dialog v-model="dialog" max-width="600">
     <v-card>
-      <v-card-title class="text-h6 d-flex align-center justify-space-between">
+      <v-card-title class="text-h4 font-weight-medium d-flex align-center justify-space-between">
         Gerenciar Categorias
         <v-btn icon flat @click="dialog = false" size="small">
           <v-icon>mdi-close</v-icon>

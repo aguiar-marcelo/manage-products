@@ -25,7 +25,7 @@ class Product(models.Model):
     price = models.FloatField(null=False, validators=[MinValueValidator(0.01)])
     expiration_date = models.DateField(null=True, blank=True)
     
-    image = models.ImageField(upload_to=product_image_path, unique=True, null=True, blank=True)
+    image = models.ImageField(upload_to=product_image_path, unique=True, null=True, blank=True, )
     
     category = models.ForeignKey(
         'Category', 

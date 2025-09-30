@@ -6,7 +6,8 @@ import type { Product } from '@/types/product';
 import { getProducts } from '@/services/productServices';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
-import { titleize } from '@/utils/texts';
+import { useAlertStore } from '@/stores/alertStore';
+const alert = useAlertStore();
 dayjs.locale('pt-br');
 
 const products = ref<Product[]>([]);
@@ -26,6 +27,7 @@ const fetchProducts = async (page: number) => {
     totalPages.value = response.totalPages;
   } catch (error) {
     console.error('Erro ao buscar produtos:', error);
+    alert.error('Erro ao buscar produtos.');
   } finally {
     isLoading.value = false;
   }
@@ -97,7 +99,7 @@ onMounted(() => {
   bottom: 0;
   right: 0;
   background-color: #ecececb6;
-  padding: 1px 2px;
+  padding: 1px 5px;
   font-size: 10px;
   border-radius: 5px 0;
 }

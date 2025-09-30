@@ -9,10 +9,16 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProductSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),
+        source='category',
+        write_only=True
+    )
+
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'expiration_date', 'image', 'category')
-        depth = 1
+        fields = ('id', 'name', 'description', 'price', 'expiration_date', 'image', 'category', 'category_id')
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
