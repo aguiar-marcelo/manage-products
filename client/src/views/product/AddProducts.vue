@@ -115,9 +115,12 @@ const handleAddCategory = async () => {
     newCategoryName.value = '';
     await fetchCategories();
     alert.success('Categoria adicionada com sucesso!');
-  } catch (error) {
-    console.error('Erro ao adicionar categoria:', error);
-    alert.error('Ocorreu um erro ao adicionar a categoria.');
+  } catch (error: any) {
+    if (error.response && error.response.status === 409) {
+      alert.error('Categoria já existe.');
+    } else {
+      alert.error('Ocorreu um erro ao adicionar Categoria.');
+    }
   } finally {
     isModalSubmitting.value = false;
   }
@@ -259,8 +262,8 @@ onMounted(() => {
     <v-card>
       <v-card-title class="text-h4 font-weight-medium d-flex align-center justify-space-between">
         Gerenciar Categorias
-        <v-btn icon flat @click="dialog = false" size="small">
-          <v-icon>mdi-close</v-icon>
+        <v-btn icon @click="dialog = false" variant="text">
+          <XIcon />
         </v-btn>
       </v-card-title>
       <v-divider></v-divider>

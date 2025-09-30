@@ -34,7 +34,7 @@ const MainRoutes = {
     {
       name: 'EditProduct',
       path: '/products/edit/:id',
-      component: () => import('@/views/product/EditProducts.vue')
+      component: () => import('@/views/product/EditProduct.vue')
     },
     ///////////////// ------------------
     {

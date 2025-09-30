@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import type { Product } from '@/types/product';
 import dayjs from 'dayjs';
-import { PencilIcon, TrashIcon } from 'vue-tabler-icons';
+import { CalendarIcon, PencilIcon, TagIcon, TrashIcon, XIcon } from 'vue-tabler-icons';
 import { deleteProduct, putProduct } from '@/services/productServices';
 import { useAlertStore } from '@/stores/alertStore';
 import { useRouter } from 'vue-router';
@@ -56,26 +56,34 @@ const handleDelete = async () => {
 <template>
   <v-dialog v-model="dialogVisible" max-width="800">
     <v-card v-if="product">
-      <v-toolbar flat>
-        <v-card-title class="text-h6 font-weight-medium">{{ product.name }}</v-card-title>
-        <v-spacer></v-spacer>
-        <v-btn icon @click="dialogVisible = false">
-          <v-icon>mdi-close</v-icon>
+      <v-card-title class="text-h4 font-weight-medium d-flex align-center justify-space-between">
+        Gerenciar Categorias
+        <v-btn icon @click="dialogVisible = false" variant="text">
+          <XIcon/>
         </v-btn>
-      </v-toolbar>
+      </v-card-title>
+      <v-divider></v-divider>
       <v-card-text>
         <v-row>
           <v-col cols="12" md="6">
-            <v-img :src="product.image" cover height="350px"></v-img>
-            <div class="mt-2 text-center text-caption text-medium-emphasis">
-              Validade: <strong>{{ dayjs(product.expiration_date).format('DD/MM/YYYY') }}</strong>
+            <v-img
+              :src="product.image || 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Image-not-found.png?20210521171500'"
+              cover
+              height="350px"
+            ></v-img>
+            <div class="mt-2 text-center text-caption text-medium-emphasis d-flex align-center justify-center">
+              Validade: &nbsp;<strong>{{ dayjs(product.expiration_date).format('DD/MM/YYYY') }} </strong>
+              <CalendarIcon :size="16" class="ml-2" />
             </div>
           </v-col>
           <v-col cols="12" md="6">
-            <h4 class="text-h5 mb-2">{{ product.name }}</h4>
+            <h4 class="text-h2 font-weight-regular mb-2">{{ product.name }}</h4>
             <div class="d-flex align-center my-3">
-              <span class="price-modal mr-4">R$ {{ (Number(product.price) || 0).toFixed(2).replace('.', ',') }}</span>
-              <v-chip size="small" variant="flat" color="primary">{{ product.category?.name ?? 'Sem categoria' }}</v-chip>
+              <span class="price">R$ {{ (Number(product.price) || 0).toFixed(2).replace('.', ',') }}</span>
+              <v-chip size="small" class="ml-5 text-body-1" variant="flat" color="primary">
+                <TagIcon :size="16" class="mr-2" />
+                {{ product.category?.name ?? 'Sem categoria' }}
+              </v-chip>
             </div>
             <v-divider class="my-4"></v-divider>
             <p>{{ product.description }}</p>
@@ -94,8 +102,8 @@ const handleDelete = async () => {
 </template>
 
 <style scoped>
-.price-modal {
-  font-size: 24px;
+.price {
+  font-size: 20px;
   font-weight: bold;
   color: #7cb342;
 }

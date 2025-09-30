@@ -84,8 +84,7 @@ const fetchProductData = async () => {
     selectedCategory.value = product.category;
   } catch (error) {
     console.error('Erro ao buscar produto:', error);
-    alert.error('Erro ao carregar dados do produto.');
-    router.push('/products');
+    router.push('/error');
   } finally {
     isLoadingData.value = false;
   }
@@ -128,9 +127,12 @@ const handleAddCategory = async () => {
     newCategoryName.value = '';
     await fetchCategories();
     alert.success('Categoria adicionada com sucesso!');
-  } catch (error) {
-    console.error('Erro ao adicionar categoria:', error);
-    alert.error('Ocorreu um erro ao adicionar a categoria.');
+  } catch (error: any) {
+    if (error.response && error.response.status === 409) {
+      alert.error('Categoria já existe.');
+    } else {
+      alert.error('Ocorreu um erro ao adicionar Categoria.');
+    }
   } finally {
     isModalSubmitting.value = false;
   }

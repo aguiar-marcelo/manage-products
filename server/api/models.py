@@ -29,7 +29,7 @@ class Product(models.Model):
     
     category = models.ForeignKey(
         'Category', 
-        on_delete=models.CASCADE, 
+        on_delete=models.SET_NULL, # ao excluir category, não exclui o produto
         null=True, 
         blank=True
     )
