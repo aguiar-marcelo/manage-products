@@ -40,7 +40,7 @@ const sidebarItem: menu[] = [
   {
     title: 'Novo Produto',
     icon: PlusIcon,
-    to: '/add-products'
+    to: '/products/add'
   },
   {
     title: 'Produtos',

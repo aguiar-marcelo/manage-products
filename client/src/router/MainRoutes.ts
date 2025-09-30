@@ -28,8 +28,13 @@ const MainRoutes = {
     },
     {
       name: 'AddProduct',
-      path: '/add-products',
+      path: '/products/add',
       component: () => import('@/views/product/AddProducts.vue')
+    },
+    {
+      name: 'EditProduct',
+      path: '/products/edit/:id',
+      component: () => import('@/views/product/EditProducts.vue')
     },
     ///////////////// ------------------
     {

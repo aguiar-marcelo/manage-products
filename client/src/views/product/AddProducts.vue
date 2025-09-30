@@ -2,13 +2,14 @@
 import { ref, onMounted } from 'vue';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
 import { UploadIcon, PlusIcon, TrashIcon } from 'vue-tabler-icons';
-import { postProduct, getCategories, postCategory, deleteCategory } from '@/services/productServices';
+import { postProduct } from '@/services/productServices';
 import type { Category } from '@/types/product';
 import { titleize } from '@/utils/texts';
 import { useAlertStore } from '@/stores/alertStore';
 import { Form, Field } from 'vee-validate';
 import * as yup from 'yup';
 import dayjs from 'dayjs';
+import { deleteCategory, getCategories, postCategory } from '@/services/categoryServices';
 dayjs().locale('pt-br');
 
 const alert = useAlertStore();
@@ -75,8 +76,8 @@ const handlePriceChange = (value: string, handleChange: Function) => {
 const handleAddProduct = async (values: any, { resetForm }: any) => {
   try {
     const productData = {
-      name: values.name,
-      desc: values.desc || '',
+      name: values.name.trim(),
+      desc: values.desc.trim() || '',
       price: values.price,
       validate: values.validate,
       img: values.img,
