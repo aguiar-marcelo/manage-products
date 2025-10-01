@@ -9,7 +9,9 @@ const authStore = useAuthStore();
 <template>
   <div class="pa-4">
     <h4 class="mb-n1">
-      <span class="font-weight-regular">{{ titleize(authStore.user?.first_name) }} {{ titleize(authStore.user?.last_name) }}</span>
+      <span class="font-weight-regular"
+        >{{ titleize(authStore.user?.first_name ?? '') }} {{ titleize(authStore.user?.last_name ?? '') }}</span
+      >
     </h4>
     <span class="text-subtitle-2 text-medium-emphasis">{{ authStore.user?.email }}</span>
 
