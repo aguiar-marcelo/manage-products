@@ -1,5 +1,3 @@
-#!/bin/sh
-
 /usr/local/bin/python manage.py makemigrations
 
 /usr/local/bin/python manage.py migrate --no-input
