@@ -1,45 +1,55 @@
 <script setup lang="ts">
-// imported components
-import TotalEarning from './components/TotalEarning.vue';
-import TotalOrder from './components/TotalOrder.vue';
-import TotalIncome from './components/TotalIncome.vue';
-import TotalGrowth from './components/TotalGrowth.vue';
-import PopularStocks from './components/PopularStocks.vue';
+import QuantityProducts from './components/QuantityProducts.vue';
+import QuantityCategories from './components/QuantityCategories.vue';
+import PricesProducts from './components/PricesProducts.vue';
+import ProductsPerCategoryChart from './components/ProductsPerCategoryChart.vue';
+import { onMounted, ref } from 'vue';
+import { getDashboardData } from '@/services/dashboardServices';
+import type { Dashboard } from '@/types/product';
+
+const dashboarData = ref<Dashboard>({
+  total_products: 0,
+  total_categories: 0,
+  total_products_price: 0,
+  total_expired_products_price: 0,
+  products_per_category: []
+});
+
+const DashboardData = async () => {
+  try {
+    const response = await getDashboardData();
+    dashboarData.value = response;
+  } catch (error) {
+    console.error('Erro ao buscar dados do dashboard:', error);
+  }
+};
+onMounted(() => {
+  DashboardData();
+});
 </script>
 
 <template>
   <v-row>
-    <!-- -------------------------------------------------------------------- -->
-    <!-- Total Earning -->
-    <!-- -------------------------------------------------------------------- -->
     <v-col cols="12" md="4">
-      <TotalEarning />
-    </v-col>
-    <!-- -------------------------------------------------------------------- -->
-    <!-- Total Order -->
-    <!-- -------------------------------------------------------------------- -->
-    <v-col cols="12" md="4">
-      <TotalOrder />
-    </v-col>
-    <!-- -------------------------------------------------------------------- -->
-    <!-- Total Income -->
-    <!-- -------------------------------------------------------------------- -->
-    <v-col cols="12" md="4">
-      <TotalIncome />
+      <QuantityProducts :value="dashboarData.total_products" label="Produto(s)" />
     </v-col>
 
-    <!-- -------------------------------------------------------------------- -->
-    <!-- Total Growth -->
-    <!-- -------------------------------------------------------------------- -->
-    <v-col cols="12" lg="8">
-      <TotalGrowth />
+    <v-col cols="12" md="4">
+      <QuantityCategories :value="dashboarData.total_categories" label="Categoria(s)" />
     </v-col>
 
-    <!-- -------------------------------------------------------------------- -->
-    <!-- Popular Stocks -->
-    <!-- -------------------------------------------------------------------- -->
-    <v-col cols="12" lg="4">
-      <PopularStocks />
+    <v-col cols="12" md="4">
+      <PricesProducts
+        :productsPrice="(Number(dashboarData.total_products_price) || 0).toFixed(2).replace('.', ',')"
+        productsLabel="Total em produtos"
+        :productsExpiredPrice="(Number(dashboarData.total_expired_products_price) || 0).toFixed(2).replace('.', ',')"
+        productsExpiredLabel="Total em produtos vencidos"
+      />
     </v-col>
+
+    <v-col cols="12" >
+      <ProductsPerCategoryChart :chart-data=dashboarData.products_per_category />
+    </v-col>
+
   </v-row>
 </template>

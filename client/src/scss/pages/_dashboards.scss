@@ -74,15 +74,15 @@
     }
   }
 
-  &.bubble-warning {
+  &.bubble-error {
     &::before {
-      background: linear-gradient(140.9deg, rgb(var(--v-theme-warning)) -14.02%, rgba(144, 202, 249, 0) 70.5%);
+      background: linear-gradient(140.9deg, rgb(233, 4, 4) -14.02%, rgba(144, 202, 249, 0) 70.5%);
     }
   }
 
-  &.bubble-warning {
+  &.bubble-error {
     &::after {
-      background: linear-gradient(210.04deg, rgb(var(--v-theme-warning)) -50.94%, rgba(144, 202, 249, 0) 83.49%);
+      background: linear-gradient(210.04deg, rgb(255, 0, 0) -50.94%, rgba(144, 202, 249, 0) 83.49%);
     }
   }
 }

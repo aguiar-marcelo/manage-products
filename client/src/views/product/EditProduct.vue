@@ -50,7 +50,7 @@ const selectedCategory = ref<Category | null>(null);
 const schema = yup.object({
   name: yup.string().required('Nome é obrigatório').max(50, 'Nome deve ter no máximo 50 caracteres'),
   price: yup.number().typeError('Preço deve ser um número').required('Preço é obrigatório').positive('Preço deve ser maior que 0'),
-  description: yup.string().max(200, 'Descrição deve ter no máximo 200 caracteres'),
+  description: yup.string().required('Descrição é obrigatório').max(200, 'Descrição deve ter no máximo 200 caracteres'),
   expiration_date: yup
     .date()
     .required('Data de validade obrigatório')
@@ -199,7 +199,7 @@ onMounted(() => {
                   <v-text-field
                     v-bind="field"
                     :model-value="field.value"
-                    @update:model-value="(val) => handlePriceChange(val, field.onChange)"
+                    @update:model-value="(val: string) => handlePriceChange(val, field.onChange)"
                     label="Preço"
                     placeholder="Ex: 15.50"
                     prefix="R$"
@@ -272,7 +272,7 @@ onMounted(() => {
                     type="file"
                     style="display: none"
                     accept="image/*"
-                    @change="(e) => onFileChange(e, handleChange)"
+                    @change="(e: Event) => onFileChange(e, handleChange)"
                   />
                   <div v-if="errorMessage" class="text-error mt-2">{{ errorMessage }}</div>
                 </Field>

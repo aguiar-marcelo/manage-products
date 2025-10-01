@@ -21,3 +21,14 @@ export interface NewProduct {
   img: File | null;
   category: Category | null | undefined;
 }
+
+export interface Dashboard {
+  total_products: number;
+  total_categories: number;
+  total_products_price: number;
+  total_expired_products_price: number;
+  products_per_category: {
+    name: string;
+    product_count: number;
+  }[];
+}
