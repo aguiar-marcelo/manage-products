@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import type { Product } from '@/types/product';
 import dayjs from 'dayjs';
 import { CalendarIcon, PencilIcon, TagIcon, TrashIcon, XIcon } from 'vue-tabler-icons';
-import { deleteProduct, putProduct } from '@/services/productServices';
+import { deleteProduct } from '@/services/productServices';
 import { useAlertStore } from '@/stores/alertStore';
 import { useRouter } from 'vue-router';
 
@@ -44,8 +44,13 @@ const handleDelete = async () => {
       alert.success('Produto excluído com sucesso!');
       emit('productDeleted');
       dialogVisible.value = false;
-    } catch (error) {
-      alert.error('Ocorreu um erro ao excluir o produto.');
+    } catch (error: any) {
+      if (error.response && error.response.status === 403) {
+        alert.error('Seu usuário não tem permissão para excluir este produto.');
+      } else {
+        console.error('Erro ao excluir produto:', error);
+        alert.error('Ocorreu um erro ao excluir o produto.');
+      }
     } finally {
       isProcessing.value = false;
     }
@@ -59,7 +64,7 @@ const handleDelete = async () => {
       <v-card-title class="text-h4 font-weight-medium d-flex align-center justify-space-between">
         Gerenciar Categorias
         <v-btn icon @click="dialogVisible = false" variant="text">
-          <XIcon/>
+          <XIcon />
         </v-btn>
       </v-card-title>
       <v-divider></v-divider>

@@ -72,6 +72,10 @@ export async function getProductById(id: number): Promise<Product> {
 }
 
 export async function deleteProduct(id: number) {
-  const { data } = await api.delete(`/products/${id}/`);
-  return data;
+  try {
+    const { data } = await api.delete(`/products/${id}/`);
+    return data;
+  } catch (error) {
+    throw error;
+  }
 }

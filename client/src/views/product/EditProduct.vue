@@ -98,14 +98,18 @@ const handleEditProduct = async (values: any) => {
       price: values.price,
       expiration_date: values.expiration_date,
       img: values.img,
-      category_id: values.category?.id,
+      category_id: values.category?.id
     };
     await putProduct(productId.value, productData);
     alert.success('Produto atualizado com sucesso!');
     router.push('/products');
   } catch (error: any) {
-    console.error('Erro ao editar produto:', error);
-    alert.error('Erro ao editar produto. Verifique os dados.');
+    if (error.response && error.response.status === 403) {
+      alert.error('Seu usuário não tem permissão para editar este produto.');
+    } else {
+      console.error('Erro ao editar produto:', error);
+      alert.error('Erro ao editar produto. Verifique os dados.');
+    }
   }
 };
 
@@ -170,7 +174,12 @@ onMounted(() => {
           <p class="mt-4">Carregando dados do produto...</p>
         </div>
         <div v-else-if="initialProductData">
-          <Form @submit="handleEditProduct" :validation-schema="schema" :initial-values="initialProductData" v-slot="{ errors, isSubmitting }">
+          <Form
+            @submit="handleEditProduct"
+            :validation-schema="schema"
+            :initial-values="initialProductData"
+            v-slot="{ errors, isSubmitting }"
+          >
             <v-row>
               <v-col cols="12" sm="6">
                 <Field name="name" v-slot="{ field, errorMessage }">

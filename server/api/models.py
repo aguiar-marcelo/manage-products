@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.utils import timezone
 import os
@@ -26,13 +27,13 @@ class Product(models.Model):
     expiration_date = models.DateField(null=True, blank=True)
     
     image = models.ImageField(upload_to=product_image_path, unique=True, null=True, blank=True, )
-    
     category = models.ForeignKey(
         'Category', 
         on_delete=models.SET_NULL, # ao excluir category, não exclui o produto
         null=True, 
         blank=True
     )
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = "Produto"
