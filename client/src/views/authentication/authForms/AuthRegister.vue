@@ -2,13 +2,11 @@
 import { ref } from 'vue';
 import { Form, Field } from 'vee-validate';
 import * as yup from 'yup';
-import Google from '@/assets/images/auth/social-google.svg';
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
 const showPassword = ref(false);
 
-// Schema de validação usando Yup para todos os campos
 const schema = yup.object({
   firstname: yup.string().required('Nome é obrigatório'),
   lastname: yup.string().required('Sobrenome é obrigatório'),
@@ -19,10 +17,8 @@ const schema = yup.object({
 /* eslint-disable @typescript-eslint/no-explicit-any */
 async function validate(values: any, { setErrors }: any) {
   try {
-    // Chamada à função `register` do authStore com os dados do formulário
     await authStore.register(values.firstname, values.lastname, values.email, values.password);
   } catch (e: any) {
-    // Captura erros da API e exibe no formulário
     setErrors({ apiError: e?.message || 'Ocorreu um erro.' });
   }
 }

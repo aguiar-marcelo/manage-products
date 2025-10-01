@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { useAuthStore } from '@/stores/auth'; // Importe o store
+import { useAuthStore } from '@/stores/auth';
 
 const api = axios.create({
   baseURL: 'http://127.0.0.1:8000/api',
-  timeout: 5000,
+  timeout: 5000
 });
 
 api.interceptors.request.use(
@@ -27,19 +27,13 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (
-      originalRequest.url.includes('/token/refresh/') &&
-      error.response.status === 401 &&
-      !originalRequest._retry
-    ) {
-      const authStore = useAuthStore();
-      authStore.logout();
+    if (['/token/', '/token/refresh/', '/register/'].some((endpoint) => originalRequest.url.includes(endpoint))) {
       return Promise.reject(error);
     }
-
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       const authStore = useAuthStore();
+
       try {
         const newAccessToken = await authStore.refreshToken();
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
